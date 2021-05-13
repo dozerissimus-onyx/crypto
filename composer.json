@@ -7,12 +7,6 @@
         "laravel"
     ],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url":  "https://github.com/Merkeleon/php-cryptocurrency-address-validation.git"
-        }
-    ],
     "require": {
         "php": "^7.2.5|^8.0",
         "cristal/php-api-wrapper": "^5.1",
@@ -21,7 +15,9 @@
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
-        "murich/php-cryptocurrency-address-validation": "master"
+        "merkeleon/php-cryptocurrency-address-validation": "^1.2",
+        "christian-riesen/base32": "^1.1@dev",
+        "pburggraf/crc": "dev-master"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

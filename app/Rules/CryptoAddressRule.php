@@ -2,14 +2,14 @@
 
 namespace App\Rules;
 
-use App\Service\Elliptic;
+use App\Service\CryptoAddressValidator\CryptoAddressValidator;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 
-class RiskScoreRule implements Rule
+class CryptoAddressRule implements Rule
 {
     protected $request;
-    protected $elliptic;
+    protected $validator;
 
     /**
      * Create a new rule instance.
@@ -20,12 +20,7 @@ class RiskScoreRule implements Rule
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->elliptic = new Elliptic();
-        $this->elliptic->setParams([
-            'address' => $request->address,
-            'asset' => $request->currency_code
-        ]);
-        $this->elliptic->walletSynchronous();
+        $this->validator = CryptoAddressValidator::make($request->currency_code);
     }
 
     /**
@@ -37,7 +32,7 @@ class RiskScoreRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return $this->elliptic->getRiskScore() && $this->elliptic->getRiskScore() > Elliptic::RISK_HIGH;
+        return $this->validator->validate($value);
     }
 
     /**
@@ -47,6 +42,6 @@ class RiskScoreRule implements Rule
      */
     public function message()
     {
-        return 'High risk score.';
+        return 'Address is incorrect.';
     }
 }

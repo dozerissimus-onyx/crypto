@@ -13,9 +13,6 @@ class Elliptic
     const TYPE_SOURCE = 'source_of_funds';
     const TYPE_DESTINATION = 'destination_of_funds';
 
-    public static array $availableAssets = ['BTC', 'BCH', 'ETH', 'XRP', 'LTC', 'XLM', 'ZEC', 'EOS', 'XTZ', 'COMP', 'GRT', 'YFI'];
-    public static array $erc20Tokens = ['LINK', 'USDC', 'USDT'];
-
     /**
      * @var Client $client
      */
@@ -98,12 +95,9 @@ class Elliptic
                 "asset" => strtoupper($this->params['asset'] ?? 'BTC'),
                 "hash" => $this->params['address'] ?? '',
                 "type" => "address",
-                'token' => 'comp '
             ],
             "type" => "wallet_exposure"
         ];
-
-
 
         $response = $this->request();
         $this->riskScore = $response['risk_score'] ?? null;

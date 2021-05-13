@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cec54e2a43055365461cbbcfb2267b3f",
+    "content-hash": "75a39a76005d2b9eedbc1d780fd54657",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -109,6 +109,61 @@
                 }
             ],
             "time": "2021-01-20T22:51:39+00:00"
+        },
+        {
+            "name": "christian-riesen/base32",
+            "version": "1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ChristianRiesen/base32.git",
+                "reference": "2e82dab3baa008e24a505649b0d583c31d31e894"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/2e82dab3baa008e24a505649b0d583c31d31e894",
+                "reference": "2e82dab3baa008e24a505649b0d583c31d31e894",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.17",
+                "phpstan/phpstan": "^0.12",
+                "phpunit/phpunit": "^8.5.13 || ^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Base32\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Riesen",
+                    "email": "chris.riesen@gmail.com",
+                    "homepage": "http://christianriesen.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Base32 encoder/decoder according to RFC 4648",
+            "homepage": "https://github.com/ChristianRiesen/base32",
+            "keywords": [
+                "base32",
+                "decode",
+                "encode",
+                "rfc4648"
+            ],
+            "time": "2021-02-26T10:19:33+00:00"
         },
         {
             "name": "cristal/php-api-wrapper",
@@ -1259,6 +1314,49 @@
             "time": "2021-01-18T20:58:21+00:00"
         },
         {
+            "name": "merkeleon/php-cryptocurrency-address-validation",
+            "version": "1.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Merkeleon/php-cryptocurrency-address-validation.git",
+                "reference": "aec1f9162e49e139346a47f06687eb0f3be4b48a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Merkeleon/php-cryptocurrency-address-validation/zipball/aec1f9162e49e139346a47f06687eb0f3be4b48a",
+                "reference": "aec1f9162e49e139346a47f06687eb0f3be4b48a",
+                "shasum": ""
+            },
+            "require": {
+                "spomky-labs/cbor-php": "^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Merkeleon\\PhpCryptocurrencyAddressValidation\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Andrey Murashkin",
+                    "email": "andrey@phpteam.pro"
+                }
+            ],
+            "description": "Cryptocurrency address validation. Currently supports litecoin and bitcoin.",
+            "support": {
+                "source": "https://github.com/Merkeleon/php-cryptocurrency-address-validation/tree/1.2.3"
+            },
+            "time": "2021-04-16T12:35:46+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "2.2.0",
             "source": {
@@ -1349,39 +1447,6 @@
                 }
             ],
             "time": "2020-12-14T13:15:25+00:00"
-        },
-        {
-            "name": "murich/php-cryptocurrency-address-validation",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/murich/php-cryptocurrency-address-validation.git",
-                "reference": "28ad87ae21142db4d851ef64b1cc41008f4f2f44"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/murich/php-cryptocurrency-address-validation/zipball/28ad87ae21142db4d851ef64b1cc41008f4f2f44",
-                "reference": "28ad87ae21142db4d851ef64b1cc41008f4f2f44",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.0.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Murich\\PhpCryptocurrencyAddressValidation\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Andrey Murashkin",
-                    "email": "andrey@phpteam.pro"
-                }
-            ],
-            "description": "Cryptocurrency address validation. Currently supports litecoin and bitcoin.",
-            "time": "2018-01-26T11:27:40+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -1584,6 +1649,59 @@
                 "serialize"
             ],
             "time": "2021-04-09T13:42:10+00:00"
+        },
+        {
+            "name": "pburggraf/crc",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pburggraf/CRC.git",
+                "reference": "125ddc36ce74d22c007889b93984eba817afac55"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pburggraf/CRC/zipball/125ddc36ce74d22c007889b93984eba817afac55",
+                "reference": "125ddc36ce74d22c007889b93984eba817afac55",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "phpstan/phpstan": "^0.12",
+                "phpstan/phpstan-phpunit": "^0.12",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PBurggraf\\CRC\\": "src/PBurggraf/CRC/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Philip Burggraf",
+                    "email": "philip@pburggraf.de"
+                }
+            ],
+            "description": "Cyclic redundancy checker (crc) class to calculate crc8, crc16, crc24 and crc32 checksum values",
+            "keywords": [
+                "checksum",
+                "checksum generator",
+                "crc",
+                "crc16",
+                "crc24",
+                "crc32",
+                "crc8",
+                "cyclic redundancy checker",
+                "validation"
+            ],
+            "time": "2021-02-08T20:14:55+00:00"
         },
         {
             "name": "php-curl-class/php-curl-class",
@@ -2317,6 +2435,69 @@
                 }
             ],
             "time": "2020-08-18T17:17:46+00:00"
+        },
+        {
+            "name": "spomky-labs/cbor-php",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Spomky-Labs/cbor-php.git",
+                "reference": "9776578000be884cd7864eeb7c37a4ac92d8c995"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Spomky-Labs/cbor-php/zipball/9776578000be884cd7864eeb7c37a4ac92d8c995",
+                "reference": "9776578000be884cd7864eeb7c37a4ac92d8c995",
+                "shasum": ""
+            },
+            "require": {
+                "brick/math": "^0.8.15|^0.9.0",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12",
+                "phpstan/phpstan-beberlei-assert": "^0.12",
+                "phpstan/phpstan-deprecation-rules": "^0.12",
+                "phpstan/phpstan-phpunit": "^0.12",
+                "phpstan/phpstan-strict-rules": "^0.12"
+            },
+            "suggest": {
+                "ext-bcmath": "GMP or BCMath extensions will drastically improve the library performance. BCMath extension needed to handle the Big Float and Decimal Fraction Tags",
+                "ext-gmp": "GMP or BCMath extensions will drastically improve the library performance"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CBOR\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Florent Morselli",
+                    "homepage": "https://github.com/Spomky"
+                },
+                {
+                    "name": "All contributors",
+                    "homepage": "https://github.com/Spomky-Labs/cbor-php/contributors"
+                }
+            ],
+            "description": "CBOR Encoder/Decoder for PHP",
+            "keywords": [
+                "Concise Binary Object Representation",
+                "RFC7049",
+                "cbor"
+            ],
+            "funding": [
+                {
+                    "url": "https://www.patreon.com/FlorentMorselli",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2020-08-31T20:08:03+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -7012,7 +7193,10 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "christian-riesen/base32": 20,
+        "pburggraf/crc": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

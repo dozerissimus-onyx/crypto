@@ -1,12 +1,16 @@
 <?php
 namespace App\Http\Requests;
 
+use App\Rules\CryptoAddressRule;
+use App\Rules\CurrencyCodeRule;
 use App\Rules\RiskScoreRule;
-use App\Service\Elliptic;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\RequiredIf;
 
 class StoreWithdrawalAddressRequest extends FormRequest
 {
+    protected $stopOnFirstFailure = true;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -15,9 +19,11 @@ class StoreWithdrawalAddressRequest extends FormRequest
     public function rules()
     {
         return [
-            'currency_code' => '',
-            'address' => new RiskScoreRule($this),
-            'address_tag' => '',
+            'currency_code' => new CurrencyCodeRule(),
+            'address' => [new CryptoAddressRule($this), new RiskScoreRule($this)],
+            'address_tag' => new RequiredIf(function () {
+                return in_array(strtoupper($this->currency_code), ['XRP', 'XLM', 'EOS']);
+            }),
         ];
     }
 }
