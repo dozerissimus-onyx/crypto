@@ -6,6 +6,7 @@ use App\Http\Requests\StoreWithdrawalAddressRequest;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
 use App\Service\SumSub;
+use App\Service\Wyre;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -80,5 +81,10 @@ class WebhookController extends Controller
         }
 
         return $response;
+    }
+
+    public function test() {
+        $wyre = new Wyre();
+        dd($wyre->supportedCountries());
     }
 }

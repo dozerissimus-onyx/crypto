@@ -27,7 +27,7 @@ class SumSub
         ];
 
         $url = '/resources/applicants?levelName=basic-kyc-level';
-        $request = new GuzzleHttp\Psr7\Request('POST', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('POST', config('api.sumsub.baseUri') . $url);
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody(GuzzleHttp\Psr7\stream_for(json_encode($requestBody)));
 
@@ -40,7 +40,7 @@ class SumSub
         $client = new GuzzleHttp\Client();
         $ts = time();
 
-        $request = $request->withHeader('X-App-Token', config('sumsub.app-token'));
+        $request = $request->withHeader('X-App-Token', config('api.sumsub.app-token'));
         $request = $request->withHeader('X-App-Access-Sig', $this->createSignature($ts, $request->getMethod(), $url, $request->getBody()));
         $request = $request->withHeader('X-App-Access-Ts', $ts);
 
@@ -63,7 +63,7 @@ class SumSub
 
     private function createSignature($ts, $httpMethod, $url, $httpBody)
     {
-        return hash_hmac('sha256', $ts . strtoupper($httpMethod) . $url . $httpBody, config('sumsub.secret'));
+        return hash_hmac('sha256', $ts . strtoupper($httpMethod) . $url . $httpBody, config('api.sumsub.secret'));
     }
 
     public function addDocument($params)
@@ -84,7 +84,7 @@ class SumSub
         ]);
 
         $url = "/resources/applicants/" . $params['applicantId'] . "/info/idDoc";
-        $request = new GuzzleHttp\Psr7\Request('POST', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('POST', config('api.sumsub.baseUri') . $url);
         $request = $request->withBody($multipart);
 
         return $this->sendHttpRequest($request, $url)->getHeader("X-Image-Id")[0];
@@ -94,7 +94,7 @@ class SumSub
         // https://developers.sumsub.com/api-reference/#getting-applicant-status-api
     {
         $url = "/resources/applicants/" . $applicantId . "/requiredIdDocsStatus";
-        $request = new GuzzleHttp\Psr7\Request('GET', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('GET', config('api.sumsub.baseUri') . $url);
 
         $response =  $this->sendHttpRequest($request, $url);
         return json_decode($response->getBody());
@@ -104,14 +104,14 @@ class SumSub
         // https://developers.sumsub.com/api-reference/#access-tokens-for-sdks
     {
         $url = "/resources/accessTokens?userId=" . $externalUserId;
-        $request = new GuzzleHttp\Psr7\Request('POST', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('POST', config('api.sumsub.baseUri') . $url);
 
         return $this->sendHttpRequest($request, $url)->getBody();
     }
 
     protected function getShareToken($applicantId, $clientId) {
         $url = "/resources/accessTokens/-/shareToken?applicantId={$applicantId}&forClientId={$clientId}";
-        $request = new GuzzleHttp\Psr7\Request('POST', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('POST', config('api.sumsub.baseUri') . $url);
 
         $response = json_decode($this->sendHttpRequest($request, $url)->getBody(), true);
         return $response['token'];
@@ -119,7 +119,7 @@ class SumSub
 
     protected function importApplicant($shareToken) {
         $url = "/resources/applicants/-/import?shareToken={$shareToken}";
-        $request = new GuzzleHttp\Psr7\Request('POST', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('POST', config('api.sumsub.baseUri') . $url);
 
         return json_decode($this->sendHttpRequest($request, $url)->getBody(), true);
     }
@@ -132,7 +132,7 @@ class SumSub
 
     public function downloadImage($inspectionId, $imageId) {
         $url = "/resources/inspections/{$inspectionId}/resources/{$imageId}]";
-        $request = new GuzzleHttp\Psr7\Request('GET', config('sumsub.base_url') . $url);
+        $request = new GuzzleHttp\Psr7\Request('GET', config('api.sumsub.baseUri') . $url);
 
         $path = "{$inspectionId}/docs/{$imageId}";
 
