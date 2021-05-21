@@ -11,6 +11,10 @@ class Wyre extends ApiWrapper
     const WALLET_DEBIT = 'DEBIT_CARD';
     const WALLET_APPLE = 'APPLE_PAY';
 
+    /**
+     * Available types of wallet
+     * @var array|string[]
+     */
     protected static array $walletTypes = [
         self::WALLET_DEBIT,
         self::WALLET_APPLE
@@ -19,6 +23,10 @@ class Wyre extends ApiWrapper
     const PAYMENT_DEBIT = 'debit-card';
     const PAYMENT_APPLE = 'apple-pay';
 
+    /**
+     * Available payment methods
+     * @var array|string[]
+     */
     protected static array $paymentMethods = [
         self::PAYMENT_DEBIT,
         self::PAYMENT_APPLE
@@ -30,6 +38,10 @@ class Wyre extends ApiWrapper
     const CURRENCY_GBR = 'GBR';
     const CURRENCY_AUD = 'AUD';
 
+    /**
+     * Available currencies
+     * @var array|string[]
+     */
     protected static array $currencies = [
         self::CURRENCY_USD,
         self::CURRENCY_EUR,
@@ -41,10 +53,18 @@ class Wyre extends ApiWrapper
     const ACCOUNT_INDIVIDUAL = 'INDIVIDUAL';
     const ACCOUNT_BUSINESS = 'BUSINESS'; //Don't support yet
 
+    /**
+     * Available types of account
+     * @var array|string[]
+     */
     protected static array $accountTypes = [
         self::ACCOUNT_INDIVIDUAL
     ];
 
+    /**
+     * Available countries of account
+     * @var array|string[]
+     */
     protected static array $accountCountries = ['US'];
 
     const ACCOUNT_FIELD_ID_INDIVIDUAL_LEGAL_NAME = 'individualLegalName';
@@ -64,6 +84,10 @@ class Wyre extends ApiWrapper
     const ACCOUNT_FIELD_DOCUMENT = 'DOCUMENT';
     const ACCOUNT_FIELD_PAYMENT_METHOD = 'PAYMENT_METHOD';
 
+    /**
+     * Available account field types
+     * @var array|string[]
+     */
     protected static array $accountFieldTypes = [
         self::ACCOUNT_FIELD_ID_INDIVIDUAL_LEGAL_NAME => self::ACCOUNT_FIELD_STRING,
         self::ACCOUNT_FIELD_ID_INDIVIDUAL_CELLPHONE_NUMBER => self::ACCOUNT_FIELD_CELLPHONE,
@@ -80,6 +104,10 @@ class Wyre extends ApiWrapper
     const STATUS_PENDING = 'PENDING';
     const STATUS_APPROVED = 'APPROVED';
 
+    /**
+     * Available account field statuses
+     * @var array|string[]
+     */
     protected static array $accountFieldStatuses = [
         self::STATUS_OPEN,
         self::STATUS_PENDING,
@@ -92,6 +120,11 @@ class Wyre extends ApiWrapper
         ]);
     }
 
+    /**
+     * @param $method
+     * @param $uri
+     * @return mixed
+     */
     protected function makeRequest($method, $uri)
     {
         $timestamp = floor(microtime(true)*1000);
@@ -117,6 +150,11 @@ class Wyre extends ApiWrapper
         return json_decode($response->getBody(), true);
     }
 
+    /**
+     * @param $secret
+     * @param $val
+     * @return string
+     */
     protected function getSignature($secret, $val) {
         $hash = hash_hmac('sha256', $val, $secret);
         return $hash;
