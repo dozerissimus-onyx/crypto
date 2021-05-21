@@ -216,7 +216,7 @@ class Wyre extends ApiWrapper
 
         $possibleFields = [
             'amount', 'sourceCurrency', 'destCurrency', 'dest', 'accountId',
-            'walletType', 'amountIncludeFees', 'sourceAmount', 'destAmount'
+            'walletType', 'amountIncludeFees', 'sourceAmount', 'destAmount', 'country'
         ];
 
         foreach ($possibleFields as $field) {
@@ -289,7 +289,7 @@ class Wyre extends ApiWrapper
             'type' => isset($this->params['account']['type']) && in_array(strtoupper($this->params['account']['type']), self::$accountTypes) ?
                 strtoupper($this->params['account']['type']) : self::ACCOUNT_INDIVIDUAL,
             'country' => isset($this->params['account']['country']) && in_array(strtoupper($this->params['account']['country']), self::$accountCountries) ?
-                strtoupper($this->params['account']['type']) : 'US',
+                strtoupper($this->params['account']['country']) : 'US',
             'profileFields' => []
         ];
 
@@ -396,6 +396,8 @@ class Wyre extends ApiWrapper
         if (!in_array($fieldId, [self::ACCOUNT_FIELD_ID_INDIVIDUAL_GOVERNMENT_ID, self::ACCOUNT_FIELD_ID_INDIVIDUAL_PROOF_OF_ADDRESS])) {
             return false;
         }
+
+        //unable to verify due to lack of current account
 
         return $this->makeRequest('POST', "/v3/accounts/{$accountId}/{$fieldId}");
     }

@@ -84,7 +84,18 @@ class WebhookController extends Controller
     }
 
     public function test() {
+        //AC_7HMN9VXN7RU
+        //AC_3YZ2B8479AT
         $wyre = new Wyre();
-        dd($wyre->supportedCountries());
+
+        $wyre->setParams([
+            "amount" => "5.0",
+            "sourceCurrency" => "USD",
+            "destCurrency" => "ETH",
+            "dest" => "ethereum:0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+            "accountId" => "AC_3YZ2B8479AT",
+            "country" => "US"
+        ]);
+        dd($wyre->walletOrderQuotation());
     }
 }

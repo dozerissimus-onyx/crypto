@@ -43,11 +43,11 @@ abstract class ApiWrapper
         try {
             $response = $this->client->request($method, $uri, [
                 'headers' => $this->headers,
-                'json' => $this->body,
-                'debug' => true
+                'body' => $this->body,
+//                'debug' => true
             ]);
             if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
-                dd($response->getStatusCode());
+
             }
         } catch (GuzzleHttp\Exception\GuzzleException $e) {
             error_log($e);
