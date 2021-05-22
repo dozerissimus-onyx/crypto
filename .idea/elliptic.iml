@@ -50,7 +50,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/league/flysystem" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/league/mime-type-detection" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-client" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/event-dispatcher" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
@@ -115,6 +114,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/merkeleon/php-cryptocurrency-address-validation" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pburggraf/crc" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/christian-riesen/base32" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/codenix-sv/coingecko-api" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -8,7 +8,10 @@ use App\Service\Elliptic;
 use App\Service\SumSub;
 use App\Service\Wyre;
 use App\User;
+use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class WebhookController extends Controller
@@ -85,17 +88,48 @@ class WebhookController extends Controller
 
     public function test() {
         //AC_7HMN9VXN7RU
-        //AC_3YZ2B8479AT
-        $wyre = new Wyre();
+//        $accountID = 'AC_3YZ2B8479AT';
 
-        $wyre->setParams([
-            "amount" => "5.0",
-            "sourceCurrency" => "USD",
-            "destCurrency" => "ETH",
-            "dest" => "ethereum:0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-            "accountId" => "AC_3YZ2B8479AT",
-            "country" => "US"
-        ]);
-        dd($wyre->walletOrderQuotation());
+//        dd(date('d-m-Y H:i:s', 1621511618));
+
+        try {
+//            $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
+            $client = new CoinGeckoClient();
+            for ($i = 0; $i < 200; $i++)
+            $data = $client->ping();
+
+            if (! is_array($data)) {
+                Log::critical('Update Currencies Failed', [
+                    'data' => $data,
+                ]);
+
+                return;
+            }
+
+dd($client->getLastResponse()->getStatusCode());
+//            foreach ($data as $item) {
+//                $currency = Currency::whereType(CurrencyType::crypto)
+//                    ->whereCoingeckoId($item['id'])
+//                    ->first();
+//
+//                if (! $currency) {
+//                    continue;
+//                }
+//
+//                $currency->update([
+//                    'price' => $item['current_price'] ?? 0,
+//                    'ranking' => $item['market_cap_rank'] ?? 0,
+//                    '24h_change' => $item['price_change_percentage_24h'] ?? 0,
+//                    '24h_volume' => $item['total_volume'] ?? 0,
+//                    'circulating_supply' => $item['circulating_supply'] ?? 0,
+//                    'market_cap' => $item['market_cap'] ?? 0,
+//                ]);
+//            }
+        } catch (\Throwable $e) {
+            dd($e->getCode());
+            Log::critical('Update Currencies Failed', [
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

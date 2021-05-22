@@ -9,6 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5|^8.0",
+        "christian-riesen/base32": "^1.1@dev",
+        "codenix-sv/coingecko-api": "^1.0",
         "cristal/php-api-wrapper": "^5.1",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
@@ -16,7 +18,6 @@
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
         "merkeleon/php-cryptocurrency-address-validation": "^1.2",
-        "christian-riesen/base32": "^1.1@dev",
         "pburggraf/crc": "dev-master"
     },
     "require-dev": {

@@ -5,6 +5,7 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\MultipartStream;
 
 class Wyre extends ApiWrapper
 {
@@ -426,17 +427,21 @@ class Wyre extends ApiWrapper
      * @param $fieldId
      * @return false|mixed
      */
-    public function uploadDocument($accountId, $fieldId) {
-        if (self::$accountFieldTypes[$fieldId] ?? null !== self::ACCOUNT_FIELD_DOCUMENT) {
+    public function uploadDocument($accountId, $fieldId, $fileName) {
+        if ((self::$accountFieldTypes[$fieldId] ?? null) !== self::ACCOUNT_FIELD_DOCUMENT) {
             return false;
         }
 
         if (!in_array($fieldId, [self::ACCOUNT_FIELD_ID_INDIVIDUAL_GOVERNMENT_ID, self::ACCOUNT_FIELD_ID_INDIVIDUAL_PROOF_OF_ADDRESS])) {
             return false;
         }
-
-        //unable to verify due to lack of current account
-
+dd($fileName);
+        $this->body = new MultipartStream([
+            [
+                'name' => 'content',
+                'contents' => fopen($fileName, 'r')
+            ],
+        ]);
         return $this->makeRequest('POST', "/v3/accounts/{$accountId}/{$fieldId}");
     }
 }
