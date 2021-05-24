@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -68,18 +70,17 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
 
         $currencies = Currency::with(['charts' => function($query) use ($range) {
             $query->where('range', $range);
-            $query->where('updated_at', '<=', date('Y-m-d H:i:s', strtotime('-5 minutes')));
+            $query->where('updated_at', '<=', now()->subMinutes(5));
         }])->whereType(CurrencyType::crypto)
             ->where('show_on_prices', true)
             ->whereNotNull('coingecko_id')
             ->get();
 
-        $i = 0;
-        while ($currency = $currencies[$i] ?? null) {
-            if (!count($currency->charts)) {
-                $i++;
+        foreach ($currencies as $currency) {
+            if (! count($currency->charts)) {
                 continue;
             }
+
             try {
                 $data = $coingecko->coins()->getMarketChart($currency->coingecko_id, 'usd', $range);
 
@@ -88,7 +89,6 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
                         'id' => $currency->coingecko_id,
                         'message' => $data,
                     ]);
-                    $i++;
                     continue;
                 }
                 $currency->charts()->updateOrCreate(
@@ -98,18 +98,20 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
                     ],
                     ['stats' => json_encode($data['prices'])]
                 );
-                $i++;
-            } catch (\Throwable $e) {
+            } catch (RequestException $e) {
                 if ($e->getCode() == 429) {
-                    sleep(10);
-                    continue;
-                }
-                Log::critical('Update Currency Charts Failed', [
-                    'id' => $currency->coingecko_id,
-                    'message' => $e->getMessage(),
-                ]);
+                    $retry = $e->getResponse()->getHeader('Retry-After')[0] ??
+                        $e->getResponse()->getHeader('X-RateLimit-Reset')[0] ?? 0;
 
-                $i++;
+                    $retry = strtotime($retry) ? now()->diffInSeconds(Carbon::make($retry)) : (int)$retry;
+
+                    $this->release($retry);
+                } else {
+                    Log::critical('Update Currency Charts Failed', [
+                        'id' => $currency->coingecko_id,
+                        'message' => $e->getMessage(),
+                    ]);
+                }
             }
         }
     }

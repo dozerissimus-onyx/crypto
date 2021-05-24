@@ -8,7 +8,9 @@ use App\Service\Elliptic;
 use App\Service\SumSub;
 use App\Service\Wyre;
 use App\User;
+use Carbon\Carbon;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -91,12 +93,18 @@ class WebhookController extends Controller
 //        $accountID = 'AC_3YZ2B8479AT';
 
 //        dd(date('d-m-Y H:i:s', 1621511618));
+        $time = Carbon::make('2021-05-24 19:49:00 +0000');
+        $time = Carbon::make('0');
+        $now = now();
 
+//        dd(strtotime('0'));
         try {
 //            $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
             $client = new CoinGeckoClient();
-            for ($i = 0; $i < 200; $i++)
-            $data = $client->ping();
+            for ($i = 0; $i < 101; $i++) {
+                $data = $client->ping();
+                dump($i);
+            }
 
             if (! is_array($data)) {
                 Log::critical('Update Currencies Failed', [
@@ -106,7 +114,7 @@ class WebhookController extends Controller
                 return;
             }
 
-dd($client->getLastResponse()->getStatusCode());
+dd($client->getLastResponse());
 //            foreach ($data as $item) {
 //                $currency = Currency::whereType(CurrencyType::crypto)
 //                    ->whereCoingeckoId($item['id'])
@@ -125,8 +133,12 @@ dd($client->getLastResponse()->getStatusCode());
 //                    'market_cap' => $item['market_cap'] ?? 0,
 //                ]);
 //            }
-        } catch (\Throwable $e) {
-            dd($e->getCode());
+        } catch (RequestException $e) {
+                $retry = $e->getResponse()->getHeader('Retry-After')[0] ??
+                    $e->getResponse()->getHeader('X-RateLimit-Reset')[0] ?? 0;
+
+                dump($retry);
+                dd(strtotime($retry) ? now()->diffInSeconds(Carbon::make($retry)) : (int)$retry);
             Log::critical('Update Currencies Failed', [
                 'message' => $e->getMessage(),
             ]);

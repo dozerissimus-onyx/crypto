@@ -5,6 +5,7 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 abstract class ApiWrapper
 {
@@ -49,7 +50,7 @@ abstract class ApiWrapper
             if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
 
             }
-        } catch (GuzzleHttp\Exception\GuzzleException $e) {
+        } catch (RequestException $e) {
             error_log($e);
         }
         return $response;
