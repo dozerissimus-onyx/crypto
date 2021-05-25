@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -97,7 +98,7 @@ class WebhookController extends Controller
         $time = Carbon::make('0');
         $now = now();
 
-//        dd(strtotime('0'));
+        dd($now->diffInSeconds('2021-05-25 7:25:00 +0000'));
         try {
 //            $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
             $client = new CoinGeckoClient();

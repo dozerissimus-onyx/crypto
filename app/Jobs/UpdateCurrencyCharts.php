@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -10,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use App\Models\Currency;
@@ -24,11 +24,9 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
     protected $range;
 
     /**
-     * The number of seconds to wait before retrying the job.
-     *
      * @var int
      */
-    public $backoff = 60;
+    public $tries = 0;
 
     /**
      * Create a new job instance.
@@ -48,7 +46,7 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
     */
     public function uniqueId()
     {
-        return 'update-currency-charts';
+        return 'get-coin-gecko-data';
     }
 
     /**
@@ -58,6 +56,12 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
+        if ($timestamp = Cache::get('coin-gecko-limit')) {
+            return $this->release(
+                $timestamp - time()
+            );
+        }
+
         $coingecko = new CoinGeckoClient();
         $ranges = [
             CurrencyChart::RANGE_DAY => '1',
@@ -99,13 +103,19 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
                     ['stats' => json_encode($data['prices'])]
                 );
             } catch (RequestException $e) {
-                if ($e->getCode() == 429) {
-                    $retry = $e->getResponse()->getHeader('Retry-After')[0] ??
+                if ($e->getCode() === 429) {
+                    $retryTime = $e->getResponse()->getHeader('Retry-After')[0] ??
                         $e->getResponse()->getHeader('X-RateLimit-Reset')[0] ?? 0;
 
-                    $retry = strtotime($retry) ? now()->diffInSeconds(Carbon::make($retry)) : (int)$retry;
+                    $secondsRemaining = strtotime($retryTime) ? now()->diffInSeconds($retryTime) : (int)$retryTime;
 
-                    $this->release($retry);
+                    Cache::put(
+                        'coin-gecko-limit',
+                        now()->addSeconds($secondsRemaining)->timestamp,
+                        $secondsRemaining
+                    );
+
+                    return $this->release($secondsRemaining);
                 } else {
                     Log::critical('Update Currency Charts Failed', [
                         'id' => $currency->coingecko_id,
@@ -114,5 +124,13 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
                 }
             }
         }
+    }
+
+    /**
+     * @return \Illuminate\Support\Carbon
+     */
+    public function retryUntil()
+    {
+        return now()->addHours(12);
     }
 }

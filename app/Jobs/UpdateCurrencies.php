@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,17 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use App\Models\Currency;
 use App\Enums\CurrencyType;
+use Illuminate\Support\Facades\Cache;
 
 class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    /**
-     * The number of seconds to wait before retrying the job.
-     *
-     * @var int
-     */
-    public $backoff = 60;
 
     /**
      * Create a new job instance.
@@ -41,7 +36,7 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     */
     public function uniqueId()
     {
-        return 'update-currencies';
+        return 'get-coin-gecko-data';
     }
 
     /**
@@ -51,6 +46,11 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
+        if ($timestamp = Cache::get('coin-gecko-limit')) {
+            return $this->release(
+                $timestamp - time()
+            );
+        }
         try {
             $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
 
@@ -80,10 +80,33 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
                     'market_cap' => $item['market_cap'] ?? 0,
                 ]);
             }
-        } catch (\Throwable $e) {
-            Log::critical('Update Currencies Failed', [
-                'message' => $e->getMessage(),
-            ]);
+        } catch (RequestException $e) {
+            if ($e->getCode() === 429) {
+                $retryTime = $e->getResponse()->getHeader('Retry-After')[0] ??
+                    $e->getResponse()->getHeader('X-RateLimit-Reset')[0] ?? 0;
+
+                $secondsRemaining = strtotime($retryTime) ? now()->diffInSeconds($retryTime) : (int)$retryTime;
+
+                Cache::put(
+                    'coin-gecko-limit',
+                    now()->addSeconds($secondsRemaining)->timestamp,
+                    $secondsRemaining
+                );
+
+                return $this->release($secondsRemaining);
+            } else {
+                Log::critical('Update Currencies Failed', [
+                    'message' => $e->getMessage(),
+                ]);
+            }
         }
+    }
+
+    /**
+     * @return \Illuminate\Support\Carbon
+     */
+    public function retryUntil()
+    {
+        return now()->addHours(12);
     }
 }
