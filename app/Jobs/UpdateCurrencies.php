@@ -20,6 +20,11 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * @var int
+     */
+    public $tries = 0;
+
+    /**
      * Create a new job instance.
      *
      * @return void
@@ -38,6 +43,8 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     {
         return 'get-coin-gecko-data';
     }
+
+
 
     /**
      * Execute the job.

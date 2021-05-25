@@ -19,6 +19,11 @@ class UpdateMarketCapDailyChange implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * @var int
+     */
+    public $tries = 0;
+
+    /**
      * Create a new job instance.
      *
      * @return void
