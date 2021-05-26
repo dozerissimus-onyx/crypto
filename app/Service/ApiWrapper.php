@@ -53,13 +53,10 @@ abstract class ApiWrapper
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function sendRequest(string $method, string $uri) {
-        dump($method);
-        dump($this->body);
         try {
             $response = $this->client->request($method, $uri, [
                 'headers' => $this->headers,
                 'body' => $this->body,
-                'debug' => true
             ]);
             if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
                 // Some actions
@@ -67,7 +64,6 @@ abstract class ApiWrapper
             dump($response->getStatusCode());
             return $response;
         } catch (RequestException $e) {
-            dd($e);
             Log::critical(get_class($this) . ' Request Failed', ['message' => $e->getMessage()]);
         }
     }

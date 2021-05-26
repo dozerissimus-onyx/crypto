@@ -22,15 +22,15 @@ class GrowSurf extends ApiWrapper
     protected function makeRequest(string $method, string $uri)
     {
         $this->headers = [
+            'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . config('api.growsurf.key')
         ];
 
         if(!empty($this->body))
-            $this->body = json_encode($this->body, JSON_HEX_APOS);
+            $this->body = json_encode($this->body, JSON_FORCE_OBJECT);
         else
             $this->body = '';
 
-//        $this->body = '{email: "sergey.o@oobit.com"}';
         $response = $this->sendRequest($method, $uri);
 
         return $response ? json_decode($response->getBody(), true) : [];
