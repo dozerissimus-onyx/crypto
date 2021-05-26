@@ -128,8 +128,8 @@ class Elliptic
             'json' => $this->payload,
             'debug' => true
         ]);
-dd($response);
-        return json_decode($response->getBody(), true);
+
+        return $response ? json_decode($response->getBody(), true) : [];
     }
 
     /**

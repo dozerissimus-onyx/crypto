@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWithdrawalAddressRequest;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
+use App\Service\GrowSurf;
 use App\Service\SumSub;
 use App\Service\Wyre;
 use App\User;
@@ -90,59 +91,20 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        //AC_7HMN9VXN7RU
-//        $accountID = 'AC_3YZ2B8479AT';
-
-//        dd(date('d-m-Y H:i:s', 1621511618));
-        $time = Carbon::make('2021-05-24 19:49:00 +0000');
-        $time = Carbon::make('0');
-        $now = now();
-
-        dd($now->diffInSeconds('2021-05-25 7:25:00 +0000'));
-        try {
-//            $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
-            $client = new CoinGeckoClient();
-            for ($i = 0; $i < 101; $i++) {
-                $data = $client->ping();
-                dump($i);
-            }
-
-            if (! is_array($data)) {
-                Log::critical('Update Currencies Failed', [
-                    'data' => $data,
-                ]);
-
-                return;
-            }
-
-dd($client->getLastResponse());
-//            foreach ($data as $item) {
-//                $currency = Currency::whereType(CurrencyType::crypto)
-//                    ->whereCoingeckoId($item['id'])
-//                    ->first();
-//
-//                if (! $currency) {
-//                    continue;
-//                }
-//
-//                $currency->update([
-//                    'price' => $item['current_price'] ?? 0,
-//                    'ranking' => $item['market_cap_rank'] ?? 0,
-//                    '24h_change' => $item['price_change_percentage_24h'] ?? 0,
-//                    '24h_volume' => $item['total_volume'] ?? 0,
-//                    'circulating_supply' => $item['circulating_supply'] ?? 0,
-//                    'market_cap' => $item['market_cap'] ?? 0,
-//                ]);
-//            }
-        } catch (RequestException $e) {
-                $retry = $e->getResponse()->getHeader('Retry-After')[0] ??
-                    $e->getResponse()->getHeader('X-RateLimit-Reset')[0] ?? 0;
-
-                dump($retry);
-                dd(strtotime($retry) ? now()->diffInSeconds(Carbon::make($retry)) : (int)$retry);
-            Log::critical('Update Currencies Failed', [
-                'message' => $e->getMessage(),
-            ]);
-        }
+        $growSurf = new GrowSurf();
+        $campaignId = 'fr4nyx';
+        $participantId = 'x0znmz';
+        $participantEmail = 'dozerissimus@gmail.com';
+//        dd($growSurf->updateParticipant($campaignId, $participantEmail, ['firstName' => 'Sergey']));
+//        dd($growSurf->getParticipants($campaignId));
+        dd($growSurf->addParticipant('fr4nyx', 'sergey.o@oobit.com', [
+            'firstName' => 'Sally',
+            'lastName' => 'Mayweathers',
+            'metadata' => [
+                'phoneNumber' => '+1 415-123-4567',
+                'country' => 'USA',
+                'zipCode' => '94303'
+            ]
+        ]));
     }
 }

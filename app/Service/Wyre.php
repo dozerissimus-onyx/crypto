@@ -148,7 +148,7 @@ class Wyre extends ApiWrapper
 
         $response = $this->sendRequest($method, $uri);
 
-        return json_decode($response->getBody(), true);
+        return $response ? json_decode($response->getBody(), true) : [];
     }
 
     /**

@@ -19,5 +19,10 @@ return [
 //        'baseUri' => 'https://api.sendwyre.com',
         'secret' => env('WYRE_SECRET'),
         'key' => env('WYRE_KEY')
+    ],
+
+    'growsurf' => [
+        'baseUri' => 'https://api.growsurf.com',
+        'key' => env('GROWSURF_API_KEY')
     ]
 ];
