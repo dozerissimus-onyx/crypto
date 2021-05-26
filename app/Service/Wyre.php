@@ -124,9 +124,10 @@ class Wyre extends ApiWrapper
     /**
      * @param $method
      * @param $uri
+     * @param array $body
      * @return mixed
      */
-    protected function makeRequest($method, $uri)
+    protected function makeRequest($method, $uri, $body = [])
     {
         $timestamp = floor(microtime(true)*1000);
 

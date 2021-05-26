@@ -61,7 +61,7 @@ abstract class ApiWrapper
             if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
                 // Some actions
             }
-            dump($response->getStatusCode());
+
             return $response;
         } catch (RequestException $e) {
             Log::critical(get_class($this) . ' Request Failed', ['message' => $e->getMessage()]);

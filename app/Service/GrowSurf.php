@@ -5,33 +5,47 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
-class GrowSurf extends ApiWrapper
+class GrowSurf
 {
-    public function __construct() {
-        $this->client = new Client([
-            'base_uri' => config('api.growsurf.baseUri')
-        ]);
-    }
-
     /**
+     * Make and send request
+     *
      * @param string $method
      * @param string $uri
+     * @param array $body
      * @return mixed
      */
-    protected function makeRequest(string $method, string $uri)
+    protected function makeRequest(string $method, string $uri, array $body = [])
     {
-        $this->headers = [
+        $client = new Client([
+            'base_uri' => config('api.growsurf.baseUri')
+        ]);
+
+        $headers = [
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . config('api.growsurf.key')
         ];
 
-        if(!empty($this->body))
-            $this->body = json_encode($this->body, JSON_FORCE_OBJECT);
+        if(!empty($body))
+            $body = json_encode($body, JSON_FORCE_OBJECT);
         else
-            $this->body = '';
+            $body = '';
 
-        $response = $this->sendRequest($method, $uri);
+        try {
+            $response = $client->request($method, $uri, [
+                'headers' => $headers,
+                'body' => $body,
+            ]);
+            if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
+                // Some actions
+            }
+        } catch (RequestException $e) {
+            $response = null;
+            Log::critical(get_class($this) . ' Request Failed', ['message' => $e->getMessage()]);
+        }
 
         return $response ? json_decode($response->getBody(), true) : [];
     }
@@ -43,7 +57,6 @@ class GrowSurf extends ApiWrapper
      * @return mixed
      */
     public function getCampaign(string $campaignId) {
-        $this->body = [];
         return $this->makeRequest('GET', "/v2/campaign/{$campaignId}");
     }
 
@@ -53,7 +66,6 @@ class GrowSurf extends ApiWrapper
      * @return mixed
      */
     public function getCampaigns() {
-        $this->body = [];
         return $this->makeRequest('GET', "/v2/campaigns");
     }
 
@@ -65,7 +77,6 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getParticipant(string $campaignId, string $participant) {
-        $this->body = [];
         return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participant/{$participant}");
     }
 
@@ -77,16 +88,16 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getParticipants(string $campaignId, array $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['nextId'])) {
-            $this->body['nextId'] = $args['nextId'];
+            $body['nextId'] = $args['nextId'];
         }
         if (isset($args['limit'])) {
-            $this->body['limit'] = $args['limit'];
+            $body['limit'] = $args['limit'];
         }
 
-        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participants");
+        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participants", $body);
     }
 
     /**
@@ -97,22 +108,22 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getLeaderboard(string $campaignId, $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['nextId'])) {
-            $this->body['nextId'] = $args['nextId'];
+            $body['nextId'] = $args['nextId'];
         }
         if (isset($args['limit'])) {
-            $this->body['limit'] = $args['limit'];
+            $body['limit'] = $args['limit'];
         }
         if (isset($args['isMonthly'])) {
-            $this->body['isMonthly'] = $args['isMonthly'];
+            $body['isMonthly'] = $args['isMonthly'];
         }
         if (isset($args['leaderboardType'])) {
-            $this->body['leaderboardType'] = $args['leaderboardType'];
+            $body['leaderboardType'] = $args['leaderboardType'];
         }
 
-        return $this->makeRequest('GET', "/campaign/{$campaignId}/leaderboard");
+        return $this->makeRequest('GET', "/campaign/{$campaignId}/leaderboard", $body);
     }
 
     /**
@@ -124,30 +135,30 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function addParticipant(string $campaignId, string $participantEmail, array $args = []) {
-        $this->body = [];
+        $body = [];
 
-        $this->body['email'] = $participantEmail;
+        $body['email'] = $participantEmail;
 
         if (isset($args['referredBy'])) {
-            $this->body['referredBy'] = $args['referredBy'];
+            $body['referredBy'] = $args['referredBy'];
         }
         if (isset($args['referralStatus'])) {
-            $this->body['referralStatus'] = $args['referralStatus'];
+            $body['referralStatus'] = $args['referralStatus'];
         }
         if (isset($args['firstName'])) {
-            $this->body['firstName'] = $args['firstName'];
+            $body['firstName'] = $args['firstName'];
         }
         if (isset($args['lastName'])) {
-            $this->body['lastName'] = $args['lastName'];
+            $body['lastName'] = $args['lastName'];
         }
         if (isset($args['ipAddress'])) {
-            $this->body['ipAddress'] = $args['ipAddress'];
+            $body['ipAddress'] = $args['ipAddress'];
         }
         if (isset($args['metadata'])) {
-            $this->body['metadata'] = $args['metadata'];
+            $body['metadata'] = $args['metadata'];
         }
 
-        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/participant");
+        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/participant", $body);
     }
 
     /**
@@ -158,7 +169,6 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function triggerReferralByParticipant(string $campaignId, string $participant) {
-        $this->body = [];
         return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/participant/{$participant}/ref");
     }
 
@@ -171,28 +181,28 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function updateParticipant(string $campaignId, string $participant, array $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['referredBy'])) {
-            $this->body['referredBy'] = $args['referredBy'];
+            $body['referredBy'] = $args['referredBy'];
         }
         if (isset($args['referralStatus'])) {
-            $this->body['referralStatus'] = $args['referralStatus'];
+            $body['referralStatus'] = $args['referralStatus'];
         }
         if (isset($args['firstName'])) {
-            $this->body['firstName'] = $args['firstName'];
+            $body['firstName'] = $args['firstName'];
         }
         if (isset($args['lastName'])) {
-            $this->body['lastName'] = $args['lastName'];
+            $body['lastName'] = $args['lastName'];
         }
         if (isset($args['email'])) {
-            $this->body['email'] = $args['email'];
+            $body['email'] = $args['email'];
         }
         if (isset($args['metadata'])) {
-            $this->body['metadata'] = $args['metadata'];
+            $body['metadata'] = $args['metadata'];
         }
 
-        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/participant/{$participant}");
+        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/participant/{$participant}", $body);
     }
 
     /**
@@ -203,7 +213,6 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function removeParticiant(string $campaignId, string $participant) {
-        $this->body = [];
         return $this->makeRequest('DELETE', "/v2/campaign/{$campaignId}/participant/{$participant}");
     }
 
@@ -216,16 +225,16 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getParticipantRewards(string $campaignId, string $participant, array $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['nextId'])) {
-            $this->body['nextId'] = $args['nextId'];
+            $body['nextId'] = $args['nextId'];
         }
         if (isset($args['limit'])) {
-            $this->body['limit'] = $args['limit'];
+            $body['limit'] = $args['limit'];
         }
 
-        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participant/{$participant}/rewards");
+        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participant/{$participant}/rewards", $body);
     }
 
     /**
@@ -237,12 +246,12 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function approveParticipantReward(string $campaignId, string $rewardId, array $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['fulfill'])) {
-            $this->body['fulfill'] = (bool)$args['fulfill'];
+            $body['fulfill'] = (bool)$args['fulfill'];
         }
-        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/reward/{$rewardId}/approve");
+        return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/reward/{$rewardId}/approve", $body);
     }
 
     /**
@@ -253,7 +262,6 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function fulfillParticipantReward(string $campaignId, string $rewardId) {
-        $this->body = [];
         return $this->makeRequest('POST', "/v2/campaign/{$campaignId}/reward/{$rewardId}/fulfill");
     }
 
@@ -265,7 +273,6 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function removeParticipantReward(string $campaignId, string $rewardId) {
-        $this->body = [];
         return $this->makeRequest('DELETE', "/v2/campaign/{$campaignId}/reward/{$rewardId}");
     }
 
@@ -277,34 +284,34 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getReferrals(string $campaignId, array $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['sortBy'])) {
-            $this->body['sortBy'] = $args['sortBy'];
+            $body['sortBy'] = $args['sortBy'];
         }
         if (isset($args['desc'])) {
-            $this->body['desc'] = $args['desc'];
+            $body['desc'] = $args['desc'];
         }
         if (isset($args['limit'])) {
-            $this->body['limit'] = $args['limit'];
+            $body['limit'] = $args['limit'];
         }
         if (isset($args['offset'])) {
-            $this->body['offset'] = $args['offset'];
+            $body['offset'] = $args['offset'];
         }
         if (isset($args['email'])) {
-            $this->body['email'] = $args['email'];
+            $body['email'] = $args['email'];
         }
         if (isset($args['firstName'])) {
-            $this->body['firstName'] = $args['firstName'];
+            $body['firstName'] = $args['firstName'];
         }
         if (isset($args['lastName'])) {
-            $this->body['lastName'] = $args['lastName'];
+            $body['lastName'] = $args['lastName'];
         }
         if (isset($args['referralStatus'])) {
-            $this->body['referralStatus'] = $args['referralStatus'];
+            $body['referralStatus'] = $args['referralStatus'];
         }
 
-        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/referrals");
+        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/referrals", $body);
     }
 
     /**
@@ -316,33 +323,33 @@ class GrowSurf extends ApiWrapper
      * @return array|mixed
      */
     public function getParticipantReferrals(string $campaignId, string $participant, $args = []) {
-        $this->body = [];
+        $body = [];
 
         if (isset($args['sortBy'])) {
-            $this->body['sortBy'] = $args['sortBy'];
+            $body['sortBy'] = $args['sortBy'];
         }
         if (isset($args['desc'])) {
-            $this->body['desc'] = $args['desc'];
+            $body['desc'] = $args['desc'];
         }
         if (isset($args['limit'])) {
-            $this->body['limit'] = $args['limit'];
+            $body['limit'] = $args['limit'];
         }
         if (isset($args['offset'])) {
-            $this->body['offset'] = $args['offset'];
+            $body['offset'] = $args['offset'];
         }
         if (isset($args['email'])) {
-            $this->body['email'] = $args['email'];
+            $body['email'] = $args['email'];
         }
         if (isset($args['firstName'])) {
-            $this->body['firstName'] = $args['firstName'];
+            $body['firstName'] = $args['firstName'];
         }
         if (isset($args['lastName'])) {
-            $this->body['lastName'] = $args['lastName'];
+            $body['lastName'] = $args['lastName'];
         }
         if (isset($args['referralStatus'])) {
-            $this->body['referralStatus'] = $args['referralStatus'];
+            $body['referralStatus'] = $args['referralStatus'];
         }
 
-        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participant/{$participant}/referrals");
+        return $this->makeRequest('GET', "/v2/campaign/{$campaignId}/participant/{$participant}/referrals", $body);
     }
 }
