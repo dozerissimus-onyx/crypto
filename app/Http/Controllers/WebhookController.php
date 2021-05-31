@@ -95,8 +95,9 @@ class WebhookController extends Controller
         $campaignId = 'fr4nyx';
         $participantId = 'x0znmz';
         $participantEmail = 'dozerissimus@gmail.com';
-//        dd($growSurf->updateParticipant($campaignId, $participantEmail, ['firstName' => 'Sergey']));
-//        dd($growSurf->getParticipants($campaignId));
+//        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
+//        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
+        dd($growSurf->getCampaign($campaignId));
         dd($growSurf->addParticipant('fr4nyx', 'sergey.o@oobit.com', [
             'firstName' => 'Sally',
             'lastName' => 'Mayweathers',

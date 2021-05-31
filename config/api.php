@@ -23,6 +23,8 @@ return [
 
     'growsurf' => [
         'baseUri' => 'https://api.growsurf.com',
-        'key' => env('GROWSURF_API_KEY')
+        'key' => env('GROWSURF_API_KEY'),
+        'campaignId' => 'fr4nyx',
+        'rewardId' => 'cfdug2'
     ]
 ];

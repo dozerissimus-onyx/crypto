@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/store', 'WebhookController@store');
 Route::get('/', 'WebhookController@index');
 Route::get('/test', 'WebhookController@test');
+Route::get('/signup', 'AuthController@signup');
