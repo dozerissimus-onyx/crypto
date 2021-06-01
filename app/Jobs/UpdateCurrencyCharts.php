@@ -38,14 +38,6 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
     public $retryAfter = 60;
 
     /**
-     * The maximum number of exceptions to allow before failing.
-     *
-     * @var int
-     */
-    public $maxExceptions = 10;
-
-
-    /**
      * Create a new job instance.
      *
      * @param int $range
