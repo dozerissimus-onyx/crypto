@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWithdrawalAddressRequest;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
+use App\Service\EnigmaSecurities;
 use App\Service\GrowSurf;
 use App\Service\SumSub;
 use App\Service\Wyre;
@@ -91,21 +92,32 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        $growSurf = new GrowSurf();
-        $campaignId = 'fr4nyx';
-        $participantId = 'x0znmz';
-        $participantEmail = 'dozerissimus@gmail.com';
-//        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
-//        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
-        dd($growSurf->getCampaign($campaignId));
-        dd($growSurf->addParticipant('fr4nyx', 'sergey.o@oobit.com', [
-            'firstName' => 'Sally',
-            'lastName' => 'Mayweathers',
-            'metadata' => [
-                'phoneNumber' => '+1 415-123-4567',
-                'country' => 'USA',
-                'zipCode' => '94303'
-            ]
-        ]));
+        $time = now();
+//        Cache::put('test', $time, 0);
+        dd(null < time());
+//        $growSurf = new GrowSurf();
+//        $campaignId = 'fr4nyx';
+//        $participantId = 'x0znmz';
+//        $participantEmail = 'dozerissimus@gmail.com';
+////        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
+////        dd($growSurf->getParticipantRewards($campaignId, $participantEmail));
+//        dd($growSurf->getCampaign($campaignId));
+//        dd($growSurf->addParticipant('fr4nyx', 'sergey.o@oobit.com', [
+//            'firstName' => 'Sally',
+//            'lastName' => 'Mayweathers',
+//            'metadata' => [
+//                'phoneNumber' => '+1 415-123-4567',
+//                'country' => 'USA',
+//                'zipCode' => '94303'
+//            ]
+//        ]));
+
+        $enigma = new EnigmaSecurities();
+        $enigma->getTrade([
+            'items_per_page' => 20,
+            'current_page' => 1,
+            'sort' => 'trade_id desc',
+            'status' => ['booked', 'validated']
+        ]);
     }
 }

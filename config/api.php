@@ -26,5 +26,12 @@ return [
         'key' => env('GROWSURF_API_KEY'),
         'campaignId' => 'fr4nyx',
         'rewardId' => 'cfdug2'
+    ],
+
+    'enigmaSecurities' => [
+        'baseUri' => 'https://sandbox.rest-api.enigma-securities.io',
+//        'baseUri' => 'https://api.enigma-securities.io',
+        'login' => env('ENIGMA_SECURITIES_LOGIN'),
+        'password' => env('ENIGMA_SECURITIES_PASSWORD'),
     ]
 ];

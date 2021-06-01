@@ -24,9 +24,26 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
     protected $range;
 
     /**
+     * The number of times the job may be attempted.
+     *
      * @var int
      */
-    public $tries = 0;
+    public $tries = 10;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     *
+     * @var int
+     */
+    public $retryAfter = 60;
+
+    /**
+     * The maximum number of exceptions to allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions = 10;
+
 
     /**
      * Create a new job instance.
@@ -70,10 +87,9 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
             CurrencyChart::RANGE_YEAR => '365',
             CurrencyChart::RANGE_ALL => 'max',
         ];
-        $range = $ranges[$this->range];
 
-        $currencies = Currency::with(['charts' => function($query) use ($range) {
-            $query->where('range', $range);
+        $currencies = Currency::with(['charts' => function($query) {
+            $query->where('range', $this->range);
             $query->where('updated_at', '<=', now()->subMinutes(5));
         }])->whereType(CurrencyType::crypto)
             ->where('show_on_prices', true)
@@ -86,7 +102,7 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
             }
 
             try {
-                $data = $coingecko->coins()->getMarketChart($currency->coingecko_id, 'usd', $range);
+                $data = $coingecko->coins()->getMarketChart($currency->coingecko_id, 'usd', $ranges[$this->range]);
 
                 if (! is_array($data) || ! isset($data['prices'])) {
                     Log::critical('Update Currency Charts Failed', [
@@ -124,13 +140,5 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
                 }
             }
         }
-    }
-
-    /**
-     * @return \Illuminate\Support\Carbon
-     */
-    public function retryUntil()
-    {
-        return now()->addHours(12);
     }
 }
