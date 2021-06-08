@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\UpdateCurrencies;
 use App\Jobs\UpdateMarketCapDailyChange;
 use App\Jobs\UpdateCurrencyCharts;
+use App\Models\CurrencyChart;
 
 class Kernel extends ConsoleKernel
 {

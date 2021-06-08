@@ -24,14 +24,7 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     *
     * @var int
     */
-    public $tries = 10;
-
-    /**
-     * The number of seconds to wait before retrying the job.
-     *
-     * @var int
-     */
-    public $retryAfter = 60;
+    public $tries = 100;
 
     /**
      * Create a new job instance.
@@ -50,7 +43,7 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     */
     public function uniqueId()
     {
-        return 'get-coin-gecko-data';
+        return 'update-currencies';
     }
 
 
@@ -63,9 +56,10 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
     public function handle()
     {
         if ($timestamp = Cache::get('coin-gecko-limit')) {
-            return $this->release(
+            $this->release(
                 $timestamp - time()
             );
+            return;
         }
         try {
             $data = (new CoinGeckoClient())->coins()->getMarkets('usd');
@@ -109,20 +103,13 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
                     $secondsRemaining
                 );
 
-                return $this->release($secondsRemaining);
+                $this->release($secondsRemaining);
+                return;
             } else {
                 Log::critical('Update Currencies Failed', [
                     'message' => $e->getMessage(),
                 ]);
             }
         }
-    }
-
-    /**
-     * @return \Illuminate\Support\Carbon
-     */
-    public function retryUntil()
-    {
-        return now()->addHours(12);
     }
 }

@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Lin\Huobi\HuobiSpot;
+use Lin\Huobi\HuobiSwap;
 
 class WebhookController extends Controller
 {
@@ -92,9 +94,59 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        $time = now();
+        $key = env('HUOBI_KEY');
+        $secret = env('HUOBI_SECRET');
+
+        $accountId = env('HUOBI_ACCOUNT_ID');
+
+        $huobiSpot = new \App\Service\Huobi\HuobiSpot($key, $secret);
+
+        dump('DepositAddress');
+        dump($huobiSpot->wallet()->getDepositAddress(['currency' => 'btc']));
+
+        dump('ExchangeRates');
+        dump($huobiSpot->custom()->getExchangeRates(['currency' => 'btc']));
+
+
+
+
+
+        dd($huobiSpot->market()->getTrade(['symbol'=>'btcusdt'])); //price
+        dd($huobiSpot->order()->postPlace([
+            'account-id'=>$accountId,
+            'symbol'=>'btcusdt',
+            'type'=>'buy-limit',
+            'amount'=>'5',
+            'price'=>'100',
+        ]));
+        dd($huobiSpot->market()->getDepth(['symbol' => 'btcusdt']));
+        dd($huobiSpot->market()->getTickers()['data']);
+        dd($huobiSpot->market()->getHistoryKline([
+            'symbol' => 'btcusdt',
+            'period' => '1min'
+        ]));
+//        dd($huobiSpot->common()->getSymbols());
+//        dd($huobiSpot->market()->getTrade(['symbol' => 'compbtc']));
+
+//        $huobi = new HuobiSwap($key, $secret);
+////        dump($huobi->market()->getIndex());
+//
+//        $lastTrades = $huobi->market()->getTrade();
+//        foreach ($lastTrades['tick']['data'] as $lastTrade) {
+//            dump('contract: ' . $lastTrade['contract_code'] . '; ' . 'price: ' . $lastTrade['price']); //quote
+//        }
+//        dd($huobi->trade()->postOrder([
+//            'contract_code' => 'btc-usd',
+//            'volume' => 1,
+//            'direction' => 'sell', // buy | sell
+//            'price' => 35000,
+//            'offset' => 'open', // open | close
+//
+//        ]));
+
+
 //        Cache::put('test', $time, 0);
-        dd(null < time());
+
 //        $growSurf = new GrowSurf();
 //        $campaignId = 'fr4nyx';
 //        $participantId = 'x0znmz';
