@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\CurrencyChart;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\UpdateCurrencies;
@@ -30,9 +31,9 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateCurrencies)
             ->everyMinute()
             ->withoutOverlapping();
-        $schedule->job(new UpdateMarketCapDailyChange)
-            ->everyFiveMinutes()
-            ->withoutOverlapping();
+//        $schedule->job(new UpdateMarketCapDailyChange)
+//            ->everyFiveMinutes()
+//            ->withoutOverlapping();
         $schedule->job(new UpdateCurrencyCharts(CurrencyChart::RANGE_DAY))
             ->everyMinute()
             ->withoutOverlapping();

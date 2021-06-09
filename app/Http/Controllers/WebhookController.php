@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWithdrawalAddressRequest;
+use App\Models\Currency;
+use App\Models\CurrencyChart;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
 use App\Service\EnigmaSecurities;
@@ -92,9 +94,57 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        $time = now();
+        $currencies = Currency::alsl();
+dd($currencies);
+        foreach ($currencies as $currency) {
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_DAY;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_DAY_SHORT;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_WEEK;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_MONTH;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_YEAR;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+
+            $currencyChart = new CurrencyChart();
+            $currencyChart->currency_id = $currency->id;
+            $currencyChart->range = CurrencyChart::RANGE_ALL;
+            $currencyChart->stats = '';
+            $currencyChart->save();
+        }
+
+//        dd((new CoinGeckoClient())->coins()->getMarkets('usd'));
+//        $client = new CoinGeckoClient();
+//        $coins = $client->coins()->getMarkets('usd');
+//        foreach ($coins as $coin) {
+//            $currency = new Currency();
+//            $currency->type = 'crypto';
+//            $currency->coingecko_id = $coin['id'];
+//            $currency->save();
+//        }
+
 //        Cache::put('test', $time, 0);
-        dd(null < time());
 //        $growSurf = new GrowSurf();
 //        $campaignId = 'fr4nyx';
 //        $participantId = 'x0znmz';

@@ -5,7 +5,7 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 
 abstract class ApiWrapper
@@ -63,7 +63,7 @@ abstract class ApiWrapper
             }
 
             return $response;
-        } catch (RequestException $e) {
+        } catch (GuzzleException $e) {
             Log::critical(get_class($this) . ' Request Failed', ['message' => $e->getMessage()]);
         }
     }

@@ -112,6 +112,8 @@
       <path value="$PROJECT_DIR$/vendor/pburggraf/crc" />
       <path value="$PROJECT_DIR$/vendor/christian-riesen/base32" />
       <path value="$PROJECT_DIR$/vendor/codenix-sv/coingecko-api" />
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/result-type" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-client" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.2" />

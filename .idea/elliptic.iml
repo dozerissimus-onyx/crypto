@@ -115,6 +115,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/pburggraf/crc" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/christian-riesen/base32" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/codenix-sv/coingecko-api" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/result-type" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-client" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -5,12 +5,22 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+
+/**
+ * Class EnigmaSecurities
+ * @package App\Service
+ */
 
 class EnigmaSecurities
 {
     protected $authKey;
+
+    protected static function getFacadeAccessor()
+    {
+        return 'enigma-securities';
+    }
 
     /**
      * EnigmaSecurities constructor.
@@ -57,7 +67,7 @@ class EnigmaSecurities
                 Log::critical('Enigma Securities Request Failed', ['statusCode' => $response->getStatusCode(), 'message' => $response->getReasonPhrase()]);
                 $response = null;
             }
-        } catch (RequestException $e) {
+        } catch (GuzzleException $e) {
             dump($e);
             if ($e->getCode() !== 404) {
                 Log::critical('Enigma Securities Request Failed', ['statusCode' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -70,7 +80,7 @@ dd($response);
     }
 
     /**
-     * Authentificate object
+     * Authenticate object
      *
      * @return mixed|null
      */

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use GuzzleHttp;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\MultipartStream;
 use Illuminate\Support\Facades\Storage;
 
@@ -54,7 +55,7 @@ class SumSub
                 // If an unsuccessful answer is received, please log the value of the "correlationId" parameter.
                 // Then perhaps you should throw the exception. (depends on the logic of your code)
             }
-        } catch (GuzzleHttp\Exception\GuzzleException $e) {
+        } catch (GuzzleException $e) {
             error_log($e);
         }
 

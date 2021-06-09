@@ -5,7 +5,7 @@ namespace App\Service;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Log;
 
@@ -43,7 +43,7 @@ class GrowSurf extends Facade
             if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
                 // Some actions
             }
-        } catch (RequestException $e) {
+        } catch (GuzzleException $e) {
             $participantNotFound = strpos($e->getMessage(), 'PARTICIPANT_NOT_FOUND'); // GrowSurf return 400 instead 404 when participant not found
 
             if (! $participantNotFound && $e->getCode() !== 404) {
