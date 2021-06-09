@@ -117,6 +117,10 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/codenix-sv/coingecko-api" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/result-type" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/ui" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/workerman/workerman" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/workerman/globaldata" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/linwj/huobi" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

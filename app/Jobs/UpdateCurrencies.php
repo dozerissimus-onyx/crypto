@@ -55,13 +55,10 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
-        return $this->release(30);
-
         if ($timestamp = Cache::get('coin-gecko-limit')) {
             $this->release(
                 $timestamp - time()
             );
-
             return;
         }
         try {
@@ -107,7 +104,6 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
                 );
 
                 $this->release($secondsRemaining);
-
                 return;
             } else {
                 Log::critical('Update Currencies Failed', [
@@ -115,12 +111,5 @@ class UpdateCurrencies implements ShouldQueue, ShouldBeUnique
                 ]);
             }
         }
-    }
-
-    /**
-     * @param \Exception $e
-     */
-    public function failed(\Exception $e) {
-        Log::critical('FAILED', ['message' => $e->getMessage(), 'attempts' => $this->attempts()]);
     }
 }

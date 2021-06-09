@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWithdrawalAddressRequest;
-use App\Models\Currency;
-use App\Models\CurrencyChart;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
 use App\Service\EnigmaSecurities;
@@ -20,6 +18,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Lin\Huobi\HuobiSpot;
+use Lin\Huobi\HuobiSwap;
 
 class WebhookController extends Controller
 {
@@ -94,57 +94,59 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        $currencies = Currency::alsl();
-dd($currencies);
-        foreach ($currencies as $currency) {
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_DAY;
-            $currencyChart->stats = '';
-            $currencyChart->save();
+        $key = env('HUOBI_KEY');
+        $secret = env('HUOBI_SECRET');
 
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_DAY_SHORT;
-            $currencyChart->stats = '';
-            $currencyChart->save();
+        $accountId = env('HUOBI_ACCOUNT_ID');
 
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_WEEK;
-            $currencyChart->stats = '';
-            $currencyChart->save();
+        $huobiSpot = new \App\Service\Huobi\HuobiSpot($key, $secret);
 
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_MONTH;
-            $currencyChart->stats = '';
-            $currencyChart->save();
+        dump('DepositAddress');
+        dump($huobiSpot->wallet()->getDepositAddress(['currency' => 'btc']));
 
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_YEAR;
-            $currencyChart->stats = '';
-            $currencyChart->save();
+        dump('ExchangeRates');
+        dump($huobiSpot->custom()->getExchangeRates(['currency' => 'btc']));
 
-            $currencyChart = new CurrencyChart();
-            $currencyChart->currency_id = $currency->id;
-            $currencyChart->range = CurrencyChart::RANGE_ALL;
-            $currencyChart->stats = '';
-            $currencyChart->save();
-        }
 
-//        dd((new CoinGeckoClient())->coins()->getMarkets('usd'));
-//        $client = new CoinGeckoClient();
-//        $coins = $client->coins()->getMarkets('usd');
-//        foreach ($coins as $coin) {
-//            $currency = new Currency();
-//            $currency->type = 'crypto';
-//            $currency->coingecko_id = $coin['id'];
-//            $currency->save();
+
+
+
+        dd($huobiSpot->market()->getTrade(['symbol'=>'btcusdt'])); //price
+        dd($huobiSpot->order()->postPlace([
+            'account-id'=>$accountId,
+            'symbol'=>'btcusdt',
+            'type'=>'buy-limit',
+            'amount'=>'5',
+            'price'=>'100',
+        ]));
+        dd($huobiSpot->market()->getDepth(['symbol' => 'btcusdt']));
+        dd($huobiSpot->market()->getTickers()['data']);
+        dd($huobiSpot->market()->getHistoryKline([
+            'symbol' => 'btcusdt',
+            'period' => '1min'
+        ]));
+//        dd($huobiSpot->common()->getSymbols());
+//        dd($huobiSpot->market()->getTrade(['symbol' => 'compbtc']));
+
+//        $huobi = new HuobiSwap($key, $secret);
+////        dump($huobi->market()->getIndex());
+//
+//        $lastTrades = $huobi->market()->getTrade();
+//        foreach ($lastTrades['tick']['data'] as $lastTrade) {
+//            dump('contract: ' . $lastTrade['contract_code'] . '; ' . 'price: ' . $lastTrade['price']); //quote
 //        }
+//        dd($huobi->trade()->postOrder([
+//            'contract_code' => 'btc-usd',
+//            'volume' => 1,
+//            'direction' => 'sell', // buy | sell
+//            'price' => 35000,
+//            'offset' => 'open', // open | close
+//
+//        ]));
+
 
 //        Cache::put('test', $time, 0);
+
 //        $growSurf = new GrowSurf();
 //        $campaignId = 'fr4nyx';
 //        $participantId = 'x0znmz';

@@ -132,8 +132,4 @@ class UpdateCurrencyCharts implements ShouldQueue, ShouldBeUnique
             }
         }
     }
-
-    public function failed(\Exception $e) {
-
-    }
 }

@@ -33,5 +33,5 @@ return [
 //        'baseUri' => 'https://api.enigma-securities.io',
         'login' => env('ENIGMA_SECURITIES_LOGIN'),
         'password' => env('ENIGMA_SECURITIES_PASSWORD'),
-    ]
+    ],
 ];

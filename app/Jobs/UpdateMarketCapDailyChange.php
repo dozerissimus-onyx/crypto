@@ -23,7 +23,7 @@ class UpdateMarketCapDailyChange implements ShouldQueue, ShouldBeUnique
      *
      * @var int
      */
-    public $tries = 10;
+    public $tries = 100;
 
     /**
      * Create a new job instance.
