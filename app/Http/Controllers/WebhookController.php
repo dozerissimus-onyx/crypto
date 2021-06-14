@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWithdrawalAddressRequest;
+use App\Models\Currency;
+use App\Models\HuobiOrder;
+use App\Models\HuobiSymbol;
 use App\Rules\RiskScoreRule;
 use App\Service\Elliptic;
 use App\Service\EnigmaSecurities;
@@ -14,12 +17,13 @@ use Carbon\Carbon;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Lin\Huobi\Api\Spot\Order;
 use Lin\Huobi\HuobiSpot;
-use Lin\Huobi\HuobiSwap;
 
 class WebhookController extends Controller
 {
@@ -99,8 +103,17 @@ class WebhookController extends Controller
 
         $accountId = env('HUOBI_ACCOUNT_ID');
 
-        $huobiSpot = new \App\Service\Huobi\HuobiSpot($key, $secret);
-
+        $huobiSpot = new HuobiSpot($key, $secret);
+//        dd($huobiSpot->common()->getCurrencys());
+        dd($huobiSpot->custom()->getExchangeRate([
+            'currency' => 'btc',
+            'amount' => 1000,
+            'type' => 'buy'
+        ]));
+        dd($huobiSpot->wallet()->getWithdrawQuota(['currency' => 'eth']));
+        dd($huobiSpot->market()->getDetailMerged(['symbol' => 'ethbtc']));
+        dd($huobiSpot->market()->getTickers());
+dd($huobiSpot->custom()->postExchange());
         dump('DepositAddress');
         dump($huobiSpot->wallet()->getDepositAddress(['currency' => 'btc']));
 
@@ -171,5 +184,64 @@ class WebhookController extends Controller
             'sort' => 'trade_id desc',
             'status' => ['booked', 'validated']
         ]);
+    }
+
+    public function huobi()
+    {
+        $key = env('HUOBI_KEY');
+        $secret = env('HUOBI_SECRET');
+        $accountId = env('HUOBI_ACCOUNT_ID');
+
+        $huobiSpot = new HuobiSpot($key, $secret);
+
+        $amount = 10.05; //example
+        $sellCurrency = 'eth';
+        $buyCurrency = 'btc';
+//        $sellCurrency = 'btc';
+//        $buyCurrency = 'eth';
+
+        $sellCurrencyId = Currency::whereCode(strtolower($sellCurrency))->id;
+        $buyCurrencyId = Currency::whereCode(strtolower($buyCurrency))->id;
+
+        $symbol = HuobiSymbol::where(['base_currency' => $sellCurrency, 'quote_currency' => $buyCurrency])
+            ->orWhere(function ($query) use ($sellCurrency, $buyCurrency) {
+                $query->where(['base_currency' => $buyCurrency, 'quote_currency' => $sellCurrency]);
+            })->first();
+
+        $depositAddresses = $huobiSpot->wallet()->getDepositAddress(['currency' => $sellCurrency])['data'];
+
+        $marketData = $huobiSpot->market()->getDetailMerged(['symbol' => $symbol->symbol]);
+
+        $quote = $marketData['tick']['close'];
+
+        //Deposit create with $depositAddresses[0]['address'], $depositAddresses[0]['addressTag'], $sellCurrency, $amount
+
+        $direction = strtolower($sellCurrency) === $symbol->base_currency ? 'sell' : 'buy';
+        $type = $direction . '-market';
+
+        $orderId = $huobiSpot->order()->postPlace([
+            'account-id' => $accountId,
+            'symbol' => $symbol->symbol,
+            'type' => $type,
+            'amount' => $amount,
+        ]);
+
+        $order = new HuobiOrder();
+
+        $order->fill([
+            'user_id' => Auth::id(),
+            'order_id' => $orderId,
+            'sell_currency_id' => $sellCurrencyId,
+            'buy_currency_id' => $buyCurrencyId,
+            'symbol' => $symbol->symbol,
+            'quote' => $quote,
+            'amount' => $amount,
+            'type' => $type,
+            'status' => HuobiOrder::STATUS_CREATED
+        ]);
+        $order->save();
+
+        dd($orderId);
+
     }
 }
