@@ -61,21 +61,20 @@ class EnigmaSecurities
             $response = $client->request($method, $uri, [
                 'headers' => $headers,
                 'body' => $body,
-                'debug' => true
+//                'debug' => true
             ]);
             if ($response->getStatusCode() !== 200) {
                 Log::critical('Enigma Securities Request Failed', ['statusCode' => $response->getStatusCode(), 'message' => $response->getReasonPhrase()]);
                 $response = null;
             }
         } catch (GuzzleException $e) {
-            dump($e);
             if ($e->getCode() !== 404) {
                 Log::critical('Enigma Securities Request Failed', ['statusCode' => $e->getCode(), 'message' => $e->getMessage()]);
             }
 
             $response = null;
         }
-dd($response);
+
         return $response ? json_decode($response->getBody(), true) : [];
     }
 
@@ -92,7 +91,7 @@ dd($response);
 
         $response = $this->makeRequest('PUT', '/auth', $body);
 
-        return $response['result'] ? $response['key'] : null;
+        return ($response['result'] ?? null) ? $response['key'] : null;
     }
 
     /**
@@ -107,7 +106,7 @@ dd($response);
     /**
      * @return array
      */
-    public function getProduct():array {
+    public function getProducts():array {
         return $this->makeRequest('GET', '/product/');
     }
 
@@ -115,11 +114,11 @@ dd($response);
      * @param array $args
      * @return array
      */
-    public function setQuote($args = []):array {
+    public function postQuote($args = []):array {
         $body = [];
 
         if (isset($args['side'])) {
-            $body['side'] = $args['side']; // BUY | SELL
+            $body['side'] = strtoupper($args['side']); // BUY | SELL
         }
         if (isset($args['product_id'])) {
             $body['product_id'] = $args['product_id']; // from /product endpoint
@@ -138,14 +137,14 @@ dd($response);
      * @param array $args
      * @return array
      */
-    public function setTrade($args = []):array {
+    public function postTrade($args = []):array {
         $body = [];
 
         if (isset($args['type'])) {
-            $body['type'] = $args['type']; // MKT | FOK | RFQ
+            $body['type'] = strtoupper($args['type']); // MKT | FOK | RFQ
         }
         if (isset($args['side'])) {
-            $body['side'] = $args['side']; // BUY | SELL
+            $body['side'] = strtoupper($args['side']); // BUY | SELL
         }
         if (isset($args['product_id'])) {
             $body['product_id'] = $args['product_id']; // from /product/ endpoint

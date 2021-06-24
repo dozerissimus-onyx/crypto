@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Jobs\GetHuobiOrderStatus;
+use App\Jobs\UpdateEnigmaProducts;
 use App\Jobs\UpdateHuobiSymbols;
 use App\Models\CurrencyChart;
 use Illuminate\Console\Scheduling\Schedule;
@@ -30,11 +31,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(new GetHuobiOrderStatus())
+        $schedule->job(new GetHuobiOrderStatus)
             ->everyMinute()
             ->withoutOverlapping();
         $schedule->job(new UpdateHuobiSymbols)
             ->daily()
+            ->withoutOverlapping();
+        $schedule->job(new UpdateEnigmaProducts)
+            ->everyMinute()
             ->withoutOverlapping();
 //        $schedule->job(new UpdateCurrencies)
 //            ->everyMinute()

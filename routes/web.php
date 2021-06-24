@@ -18,3 +18,4 @@ Route::get('/', 'WebhookController@index');
 Route::get('/test', 'WebhookController@test');
 Route::get('/signup', 'AuthController@signup');
 Route::get('/huobi', 'WebhookController@huobi');
+Route::get('/enigma', 'WebhookController@enigma');

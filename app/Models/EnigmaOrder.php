@@ -5,27 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HuobiOrder extends Model
+class EnigmaOrder extends Model
 {
     use HasFactory;
 
     const STATUS_CREATED = 'created';
     const STATUS_REPEATED = 'repeated';
-    const STATUS_SUBMITTED = 'submitted';
-    const STATUS_PARTIAL_FILLED = 'partial-filled';
-    const STATUS_FILLED = 'filled';
-    const STATUS_PARTIAL_CANCELED = 'partial-canceled';
-    const STATUS_CANCELING = 'canceling';
+    const STATUS_BOOKED = 'booked';
+    const STATUS_VALIDATED = 'validated';
     const STATUS_CANCELED = 'canceled';
     const STATUS_CLOSED = 'closed';
 
-    public $fillable = [
+    protected $fillable = [
         'order_id',
-        'account_id',
-        'symbol',
-        'quote',
-        'amount',
         'type',
+        'product_id',
+        'product_name',
+        'user_id',
+        'message',
+        'side',
+        'quantity',
+        'price',
+        'nominal',
         'status'
     ];
 }

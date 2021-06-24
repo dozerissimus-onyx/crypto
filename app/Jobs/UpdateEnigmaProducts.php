@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\EnigmaProduct;
 use App\Models\HuobiSymbol;
+use App\Service\EnigmaSecurities;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Lin\Huobi\HuobiSpot;
 use Illuminate\Support\Facades\Log;
 
-class UpdateHuobiSymbols implements ShouldQueue
+class UpdateEnigmaProducts implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -34,16 +36,16 @@ class UpdateHuobiSymbols implements ShouldQueue
      */
     public function handle()
     {
-        $huobiSpot = new HuobiSpot(env('HUOBI_KEY', env('HUOBI_SECRET')));
+        $enigma = new EnigmaSecurities();
 
-        $symbols = $huobiSpot->common()->getSymbols();
+        $products = $enigma->getProducts();
 
-        foreach ($symbols['data'] as $symbol) {
-            HuobiSymbol::updateOrCreate(['symbol' => $symbol['symbol']], [
-                'base_currency' => $symbol['base-currency'],
-                'quote_currency' => $symbol['quote-currency'],
-                'min_order_amount' => $symbol['limit-order-min-order-amt'],
-                'max_order_amount' => $symbol['limit-order-max-order-amt'],
+        foreach ($products as $product) {
+            EnigmaProduct::updateOrCreate(['product_name' => $product['product_name']], [
+                'product_id' => $product['product_id'],
+                'product_name' => $product['product_name'],
+                'min_quantity' => $product['min_quantity'],
+                'max_quantity' => $product['max_quantity'],
             ]);
         }
     }

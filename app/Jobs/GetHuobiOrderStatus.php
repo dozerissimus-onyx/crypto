@@ -56,7 +56,7 @@ class GetHuobiOrderStatus implements ShouldQueue
                             'amount' => $order->amount,
                         ]);
                         $order->orderId = $orderId;
-                        $order->status = HuobiOrder::STATUS_CREATED;
+                        $order->status = HuobiOrder::STATUS_REPEATED;
                         $order->save();
 
                         continue;

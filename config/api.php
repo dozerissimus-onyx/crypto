@@ -29,9 +29,14 @@ return [
     ],
 
     'enigmaSecurities' => [
-        'baseUri' => 'https://sandbox.rest-api.enigma-securities.io',
-//        'baseUri' => 'https://api.enigma-securities.io',
+//        'baseUri' => 'https://sandbox.rest-api.enigma-securities.io',
+        'baseUri' => 'https://api.enigma-securities.io',
         'login' => env('ENIGMA_SECURITIES_LOGIN'),
         'password' => env('ENIGMA_SECURITIES_PASSWORD'),
+    ],
+
+    'clearJunction' => [
+        'baseUri' => 'https://private-30ee36-clearjunctionrestapi.apiary-mock.com',
+        'key' => env('CLEAR_JUNCTION_API_KEY')
     ],
 ];

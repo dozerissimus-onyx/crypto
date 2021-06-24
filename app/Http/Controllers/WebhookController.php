@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWithdrawalAddressRequest;
 use App\Models\Currency;
+use App\Models\EnigmaOrder;
+use App\Models\EnigmaProduct;
 use App\Models\HuobiOrder;
 use App\Models\HuobiSymbol;
 use App\Rules\RiskScoreRule;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Lin\Huobi\Api\Spot\Order;
 use Lin\Huobi\HuobiSpot;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller
 {
@@ -98,46 +101,46 @@ class WebhookController extends Controller
     }
 
     public function test() {
-        $key = env('HUOBI_KEY');
-        $secret = env('HUOBI_SECRET');
-
-        $accountId = env('HUOBI_ACCOUNT_ID');
-
-        $huobiSpot = new HuobiSpot($key, $secret);
-//        dd($huobiSpot->common()->getCurrencys());
-        dd($huobiSpot->custom()->getExchangeRate([
-            'currency' => 'btc',
-            'amount' => 1000,
-            'type' => 'buy'
-        ]));
-        dd($huobiSpot->wallet()->getWithdrawQuota(['currency' => 'eth']));
-        dd($huobiSpot->market()->getDetailMerged(['symbol' => 'ethbtc']));
-        dd($huobiSpot->market()->getTickers());
-dd($huobiSpot->custom()->postExchange());
-        dump('DepositAddress');
-        dump($huobiSpot->wallet()->getDepositAddress(['currency' => 'btc']));
-
-        dump('ExchangeRates');
-        dump($huobiSpot->custom()->getExchangeRates(['currency' => 'btc']));
-
-
-
-
-
-        dd($huobiSpot->market()->getTrade(['symbol'=>'btcusdt'])); //price
-        dd($huobiSpot->order()->postPlace([
-            'account-id'=>$accountId,
-            'symbol'=>'btcusdt',
-            'type'=>'buy-limit',
-            'amount'=>'5',
-            'price'=>'100',
-        ]));
-        dd($huobiSpot->market()->getDepth(['symbol' => 'btcusdt']));
-        dd($huobiSpot->market()->getTickers()['data']);
-        dd($huobiSpot->market()->getHistoryKline([
-            'symbol' => 'btcusdt',
-            'period' => '1min'
-        ]));
+//        $key = env('HUOBI_KEY');
+//        $secret = env('HUOBI_SECRET');
+//
+//        $accountId = env('HUOBI_ACCOUNT_ID');
+//
+//        $huobiSpot = new HuobiSpot($key, $secret);
+////        dd($huobiSpot->common()->getCurrencys());
+//        dd($huobiSpot->custom()->getExchangeRate([
+//            'currency' => 'btc',
+//            'amount' => 1000,
+//            'type' => 'buy'
+//        ]));
+//        dd($huobiSpot->wallet()->getWithdrawQuota(['currency' => 'eth']));
+//        dd($huobiSpot->market()->getDetailMerged(['symbol' => 'ethbtc']));
+//        dd($huobiSpot->market()->getTickers());
+//dd($huobiSpot->custom()->postExchange());
+//        dump('DepositAddress');
+//        dump($huobiSpot->wallet()->getDepositAddress(['currency' => 'btc']));
+//
+//        dump('ExchangeRates');
+//        dump($huobiSpot->custom()->getExchangeRates(['currency' => 'btc']));
+//
+//
+//
+//
+//
+//        dd($huobiSpot->market()->getTrade(['symbol'=>'btcusdt'])); //price
+//        dd($huobiSpot->order()->postPlace([
+//            'account-id'=>$accountId,
+//            'symbol'=>'btcusdt',
+//            'type'=>'buy-limit',
+//            'amount'=>'5',
+//            'price'=>'100',
+//        ]));
+//        dd($huobiSpot->market()->getDepth(['symbol' => 'btcusdt']));
+//        dd($huobiSpot->market()->getTickers()['data']);
+//        dd($huobiSpot->market()->getHistoryKline([
+//            'symbol' => 'btcusdt',
+//            'period' => '1min'
+//        ]));
 //        dd($huobiSpot->common()->getSymbols());
 //        dd($huobiSpot->market()->getTrade(['symbol' => 'compbtc']));
 
@@ -176,14 +179,6 @@ dd($huobiSpot->custom()->postExchange());
 //                'zipCode' => '94303'
 //            ]
 //        ]));
-
-        $enigma = new EnigmaSecurities();
-        $enigma->getTrade([
-            'items_per_page' => 20,
-            'current_page' => 1,
-            'sort' => 'trade_id desc',
-            'status' => ['booked', 'validated']
-        ]);
     }
 
     public function huobi()
@@ -242,6 +237,67 @@ dd($huobiSpot->custom()->postExchange());
         $order->save();
 
         dd($orderId);
+    }
+
+    public function enigma() {
+        $enigma = new EnigmaSecurities();
+dd($enigma->getTrade());
+        $baseCurrency = 'btc';
+        $baseQty = 0; //Example (maybe get from form)
+        $quoteCurrency = 'usd';
+        $quoteQty = 100; //Example (maybe get from form)
+        $direction = 'buy';
+
+        $productName = strtoupper($baseCurrency) . '-' . strtoupper($quoteCurrency);
+
+        if (!$product = EnigmaProduct::whereProductName($productName)->first()) {
+            throw new NotFoundHttpException('Product not found');
+        }
+
+        $quoteArgs = [
+            'side' => $direction,
+            'product_id' => $product->product_id,
+        ];
+        if ($baseQty) {
+            $quoteArgs['quantity'] = $baseQty;
+        }
+        if ($quoteQty) {
+            $quoteArgs['nominal'] = $quoteQty;
+        }
+
+        $quote = $enigma->postQuote($quoteArgs);
+
+        $quoteId = $quote['quote_id'];
+        $price = $quote['price'];
+
+        $orderType = 'RFQ';
+        $trade = $enigma->postTrade([
+            'type' => $orderType,
+            'side' => $quote['side'],
+            'product_id' => $quote['product_id'],
+            'quantity' => $quote['quantity'],
+            'quote_id' => $quoteId
+        ]);
+
+        if (!empty($trade)) {
+            $order = new EnigmaOrder();
+            $order->fill([
+                'order_id' => $trade['order_id'],
+                'type' => $orderType,
+                'product_id' => $trade['product_id'],
+                'product_name' => $trade['product_name'],
+                'user_id' => Auth::id(),
+                'message' => $trade['message'],
+                'side' => $trade['side'],
+                'quantity' => $trade['quantity'],
+                'price' => $trade['price'],
+                'nominal' => $trade['nominal'],
+                'status' => EnigmaOrder::STATUS_CREATED
+            ]);
+            $order->save();
+        }
+
+        dd($trade);
 
     }
 }
