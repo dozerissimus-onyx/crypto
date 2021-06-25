@@ -53,10 +53,15 @@ class GetEnigmaOrderStatus implements ShouldQueue
                 $fee = 0;
                 $currencyCodes = explode('-', $order->product_name);
 
-                // Deposit::create
-                // $currency = $order->side === 'buy' ? $currencyCodes[0] : $currencyCodes[1];
-                // $userId = $order->user_id;
-                // $amount = $order->side === 'buy' ? $order->quantity - $fee : $order->nominal - $fee * $order->price;
+                if ($order->side === 'buy') {
+                    // Deposit::create
+                    // $currency = $currencyCodes[0];
+                    // $userId = $order->user_id;
+                    // $amount = $order->quantity - $fee;
+                } elseif ($order->side === 'sell') {
+                    // Payout
+                }
+
 
                 $order->status = EnigmaOrder::STATUS_CLOSED;
             }
