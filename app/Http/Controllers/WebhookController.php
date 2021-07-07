@@ -15,6 +15,7 @@ use App\Service\GrowSurf;
 use App\Service\SumSub;
 use App\Service\Wyre;
 use App\User;
+use BlockChair\BlockChair;
 use Carbon\Carbon;
 use Codenixsv\CoinGeckoApi\CoinGeckoClient;
 use GuzzleHttp\Exception\RequestException;
@@ -26,6 +27,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Lin\Huobi\Api\Spot\Order;
 use Lin\Huobi\HuobiSpot;
+use MockingMagician\CoinbaseProSdk\CoinbaseFacade;
+use MockingMagician\CoinbaseProSdk\Contracts\Api\ApiInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WebhookController extends Controller
@@ -299,5 +302,13 @@ dd($enigma->getTrade());
 
         dd($trade);
 
+    }
+
+    public function fees() {
+        $currency = 'BTC';
+
+        $account = Account::where(['id' => Auth::id(), 'currency_code' => $currency])->get();
+
+        dd($account->coinbase_fee);
     }
 }

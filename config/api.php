@@ -39,4 +39,11 @@ return [
         'baseUri' => 'https://private-30ee36-clearjunctionrestapi.apiary-mock.com',
         'key' => env('CLEAR_JUNCTION_API_KEY')
     ],
+
+    'coinBasePro' => [
+        'endpoint' => env('COINBASE_PRO_ENDPOINT'),
+        'key' => env('COINBASE_PRO_KEY'),
+        'secret' => env('COINBASE_PRO_SECRET'),
+        'passphrase' => env('COINBASE_PRO_PASSPHRASE')
+    ]
 ];
