@@ -305,6 +305,17 @@ dd($enigma->getTrade());
     }
 
     public function fees() {
+        $baseUrl = 'https://api.exchange.coinbase.com';
+
+        $coinBase = CoinbaseFacade::createDefaultCoinbaseApi(
+            $baseUrl,
+            config('api.coinBasePro.key'),
+            config('api.coinBasePro.secret'),
+            config('api.coinBasePro.passphrase')
+        );
+
+        dd($coinBase->withdrawals()->getFeeEstimate('BTC', '3LoJFcGiBgCzy235poxmq8uZGFGSK3ZbJN'));
+
         $currency = 'BTC';
 
         $account = Account::where(['id' => Auth::id(), 'currency_code' => $currency])->get();

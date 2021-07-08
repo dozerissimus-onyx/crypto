@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Currency;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,11 +43,12 @@ class GetCoinBaseFeeEstimates implements ShouldQueue
             config('api.coinBasePro.passphrase')
         );
 
-        $accounts = Account::all();
+        $currencies = Currency::whereHasAccounts(true);
 
-        foreach ($accounts as $account) {
-            $account->coinbase_fee = $coinBase->withdrawals()->getFeeEstimate($account->currency_code, $account->deposit_address);
-            $account->save();
+        foreach ($currencies as $currency) {
+            //This endpoint requires the "transfer" permission. API key must belong to default profile.
+            $currency->withdrawal_fee = $coinBase->withdrawals()->getFeeEstimate($currency->code, Currency::$exampleAddresses[strtoupper($currency->code)]);
+            $currency->save();
 
             usleep(100000);
         }

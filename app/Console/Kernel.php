@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\GetCoinBaseFeeEstimates;
 use App\Jobs\GetHuobiOrderStatus;
 use App\Jobs\UpdateEnigmaProducts;
 use App\Jobs\UpdateHuobiSymbols;
@@ -38,6 +39,9 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->withoutOverlapping();
         $schedule->job(new UpdateEnigmaProducts)
+            ->everyMinute()
+            ->withoutOverlapping();
+        $schedule->job(new GetCoinBaseFeeEstimates)
             ->everyMinute()
             ->withoutOverlapping();
 //        $schedule->job(new UpdateCurrencies)
